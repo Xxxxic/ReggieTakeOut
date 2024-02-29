@@ -27,13 +27,14 @@ public class MyObjectHandler implements MetaObjectHandler {
 
         metaObject.setValue("createTime", LocalDateTime.now());
         metaObject.setValue("updateTime", LocalDateTime.now());
-        // TODO: 获取用户ID
         // 其实也可以在这个自动填充类中使用@Autowired注入session对象，一样可以获得id
         // 获得session的原理和后面讲的ThreadLocal在线程中存储线程变量的原理应该是差不多的
         // 获取的session是个代理对象，会根据当前线程中存储的内容获得当前请求的上下文信息，从而获取session对象
         // @AutoWire方式获取session本质上是通过RequestContextHolder获取的，而RequestContextHolder的获取本质上应该也是基于线程变量的
-        metaObject.setValue("createUser", 1L);
-        metaObject.setValue("updateUser", 1L);
+        //metaObject.setValue("createUser", 1L);
+        //metaObject.setValue("updateUser", 1L);
+        metaObject.setValue("updateUser", BaseContext.getCurrentId());
+        metaObject.setValue("createUser", BaseContext.getCurrentId());
     }
 
     /**
@@ -46,7 +47,7 @@ public class MyObjectHandler implements MetaObjectHandler {
         log.info(metaObject.toString());
 
         metaObject.setValue("updateTime", LocalDateTime.now());
-        // TODO: 获取用户ID
-        metaObject.setValue("updateUser", 1L);
+        //metaObject.setValue("updateUser", 1L);
+        metaObject.setValue("updateUser", BaseContext.getCurrentId());
     }
 }

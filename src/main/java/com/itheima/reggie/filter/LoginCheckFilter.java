@@ -1,6 +1,7 @@
 package com.itheima.reggie.filter;
 
 import com.alibaba.fastjson.JSON;
+import com.itheima.reggie.common.BaseContext;
 import com.itheima.reggie.common.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.AntPathMatcher;
@@ -55,18 +56,21 @@ public class LoginCheckFilter implements Filter {
         boolean check = check(urls, requestURI);
         // 3.如果不需要处理，直接放行
         if (check) {
-            log.info("不需要处理 {}", requestURI);
+            //log.info("不需要处理 {}", requestURI);
             filterChain.doFilter(request, response);
             return;
         }
         // 4.需要处理:检查登陆状态，已登陆则直接放行
         if(request.getSession().getAttribute("employee") != null){
-            log.info("用户已登陆 {}", requestURI);
+            // log.info("用户已登陆 {}", requestURI);
+            Long emId = (Long) request.getSession().getAttribute("employee");
+            BaseContext.setCurrentId(emId);
+
             filterChain.doFilter(request, response);
             return;
         }
         // 5.未登陆 - 不是跳转到登陆：未登陆 则返回未登陆的结果，通过输出流方式向客户端页面响应数据
-        log.info("用户未登陆 {}", requestURI);
+        //log.info("用户未登陆 {}", requestURI);
         response.getWriter().write(JSON.toJSONString(R.error("NOTLOGIN")));
         return;
     }
