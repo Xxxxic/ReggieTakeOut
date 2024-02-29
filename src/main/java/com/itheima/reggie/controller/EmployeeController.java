@@ -86,7 +86,7 @@ public class EmployeeController {
      */
     @PostMapping
     public R<String> save(HttpServletRequest request, @RequestBody Employee employee) {
-        log.info("新增员工，员工信息：{}", employee.toString());
+        //log.info("新增员工，员工信息：{}", employee.toString());
 
         // 初始密码,md5加密
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
@@ -103,7 +103,6 @@ public class EmployeeController {
         //employee.setCreateUser(empId);
         //employee.setUpdateUser(empId);
 
-        log.info(employee.toString());
         employeeService.save(employee);
 
         return R.success("添加成功");
