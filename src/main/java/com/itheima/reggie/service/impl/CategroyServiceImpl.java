@@ -13,6 +13,8 @@ import com.itheima.reggie.service.DishService;
 import com.itheima.reggie.service.SetmealService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 public class CategroyServiceImpl extends ServiceImpl<CategoryMapper, Category> implements CategoryService {
@@ -49,4 +51,5 @@ public class CategroyServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         // 正常删除
         super.removeById(id);
     }
+
 }

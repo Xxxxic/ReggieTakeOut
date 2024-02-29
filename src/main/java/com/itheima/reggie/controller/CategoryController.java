@@ -20,7 +20,7 @@ public class CategoryController {
 
     @PostMapping
     public R<String> save(@RequestBody Category category) {
-        log.info("category : {}", category);
+        //log.info("category : {}", category);
         categroyService.save(category);
         return R.success("新增分类成功");
     }
@@ -45,14 +45,31 @@ public class CategoryController {
         return R.success(pageInfo);
     }
 
+    /**
+     * 根据id删除分类
+     * 注意这里前端传过来的数据是ids：/category?ids=1763188430562508801
+     * @param id
+     * @return
+     */
     @DeleteMapping
-    public R<String> delete(Long id){
+    public R<String> delete(@RequestParam("ids") Long id){
         log.info("删除分类：{}",id);
-
         //categroyService.removeById(id);
         categroyService.remove(id);
-
+        // TODO: confirm the result to return differently
         return R.success("删除成功");
     }
 
+    /**
+     * 根据id修改分类
+     * @param category
+     * @return
+     */
+    @PutMapping
+    public R<String> update(@RequestBody Category category){
+        //log.info(category.toString());
+        categroyService.updateById(category);
+
+        return R.success("修改成功");
+    }
 }
