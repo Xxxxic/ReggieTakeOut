@@ -17,8 +17,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 public class GlobalExceptionHandler {
 
     /**
-     * 异常处理方法
-     *
+     * 重复添加 异常
      * @param ex
      * @return
      */
@@ -33,5 +32,18 @@ public class GlobalExceptionHandler {
         }
 
         return R.error("未知错误");
+    }
+
+    /**
+     * 业务 异常 返回给前端
+     * @param ex
+     * @return
+     */
+    @ExceptionHandler(CustomException.class)
+    public R<String> exceptionHandler(CustomException ex) {
+        log.error(ex.getMessage());//报错记得打日志
+        //这里拿到的message是业务类抛出的异常信息，我们把它显示到前端
+
+        return R.error(ex.getMessage());
     }
 }

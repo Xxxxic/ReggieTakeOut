@@ -48,9 +48,11 @@ public class CategoryController {
     @DeleteMapping
     public R<String> delete(Long id){
         log.info("删除分类：{}",id);
-        //TODO:考虑外键约束
-        categroyService.removeById(id);
+
+        //categroyService.removeById(id);
+        categroyService.remove(id);
 
         return R.success("删除成功");
     }
+
 }
