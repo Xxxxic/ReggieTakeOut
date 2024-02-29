@@ -94,14 +94,14 @@ public class EmployeeController {
         // status入库自动赋值
 
         // time
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
+        //employee.setCreateTime(LocalDateTime.now());
+        //employee.setUpdateTime(LocalDateTime.now());
 
         // 创建者更新者_id 强转为Long
         // 转Long报错的话，先用对象Integer接，再转Long
         Long empId = (Long) request.getSession().getAttribute("employee");
-        employee.setCreateUser(empId);
-        employee.setUpdateUser(empId);
+        //employee.setCreateUser(empId);
+        //employee.setUpdateUser(empId);
 
         log.info(employee.toString());
         employeeService.save(employee);
@@ -153,8 +153,8 @@ public class EmployeeController {
         log.info(employee.toString());
 
         // 设置更新时间和用户 用httpSeesion范围过大 浪费了资源
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser((Long) request.getSession().getAttribute("employee"));
+        //employee.setUpdateTime(LocalDateTime.now());
+        //employee.setUpdateUser((Long) request.getSession().getAttribute("employee"));
 
         // 注意这里 js只有16位精度，而雪花19位：会导致ID精度丢失 出问题
         // 法一: 在服务端给页面响应json数据时进行处理，将long型数据统一转为String字符串
