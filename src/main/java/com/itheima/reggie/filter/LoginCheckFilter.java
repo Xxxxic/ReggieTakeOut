@@ -23,10 +23,6 @@ public class LoginCheckFilter implements Filter {
 
     /**
      * 检查路径是否匹配 需要放行
-     *
-     * @param urls
-     * @param requestURI
-     * @return
      */
     public boolean check(String[] urls, String requestURI) {
         for (String url : urls) {
@@ -72,6 +68,5 @@ public class LoginCheckFilter implements Filter {
         // 5.未登陆 - 不是跳转到登陆：未登陆 则返回未登陆的结果，通过输出流方式向客户端页面响应数据
         //log.info("用户未登陆 {}", requestURI);
         response.getWriter().write(JSON.toJSONString(R.error("NOTLOGIN")));
-        return;
     }
 }
