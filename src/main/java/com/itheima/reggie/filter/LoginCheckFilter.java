@@ -46,7 +46,8 @@ public class LoginCheckFilter implements Filter {
                 "/employee/login",
                 "/employee/logout",
                 "/backend/**",  // 静态资源
-                "/front/**"
+                "/front/**",
+                // "/page/demo/**" // 测试文件上传下载
         };
         // 2.检查是否放行
         boolean check = check(urls, requestURI);
