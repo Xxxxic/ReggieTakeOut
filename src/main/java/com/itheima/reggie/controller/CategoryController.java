@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/category")
 @ResponseBody
@@ -48,12 +50,13 @@ public class CategoryController {
     /**
      * 根据id删除分类
      * 注意这里前端传过来的数据是ids：/category?ids=1763188430562508801
+     *
      * @param id
      * @return
      */
     @DeleteMapping
-    public R<String> delete(@RequestParam("ids") Long id){
-        log.info("删除分类：{}",id);
+    public R<String> delete(@RequestParam("ids") Long id) {
+        log.info("删除分类：{}", id);
         //categroyService.removeById(id);
         categroyService.remove(id);
         // TODO: confirm the result to return differently
@@ -62,14 +65,33 @@ public class CategoryController {
 
     /**
      * 根据id修改分类
+     *
      * @param category
      * @return
      */
     @PutMapping
-    public R<String> update(@RequestBody Category category){
+    public R<String> update(@RequestBody Category category) {
         //log.info(category.toString());
         categroyService.updateById(category);
 
         return R.success("修改成功");
+    }
+
+    /**
+     * 获取分类列表 主要用于回显
+     * 不需要加@RequestBody注解: 处理GET请求
+     * 而@RequestBody注解通常用于POST请求
+     *
+     * @param category 这里参数用category拓展性更好 因为可能不只传一个type属性
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Category>> list(Category category) {
+        LambdaQueryWrapper<Category> qw = new LambdaQueryWrapper<>();
+        qw.eq(category.getType() != null, Category::getType, category.getType());
+        qw.orderByAsc(Category::getSort).orderByDesc(Category::getUpdateTime);
+        List<Category> list = categroyService.list(qw);
+
+        return R.success(list);
     }
 }
