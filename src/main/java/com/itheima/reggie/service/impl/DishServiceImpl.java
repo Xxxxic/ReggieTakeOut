@@ -1,7 +1,6 @@
 package com.itheima.reggie.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.itheima.reggie.dto.DishDto;
 import com.itheima.reggie.entity.Dish;
@@ -22,9 +21,6 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     @Autowired
     private DishFlavorService dishFlavorService;
-
-    @Autowired
-    private DishMapper dishMapper;
 
     /**
      * 新增菜品，同时保存对应的口味数据
@@ -90,10 +86,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         dishFlavorService.remove(qw);
 
         // Flavor: 重新加
-        List<DishFlavor> list = dishDto.getFlavors().stream().map((item) -> {
-            item.setDishId(dishId);
-            return item;
-        }).collect(Collectors.toList());
+        List<DishFlavor> list = dishDto.getFlavors().stream().peek((item) -> item.setDishId(dishId)).collect(Collectors.toList());
         dishFlavorService.saveBatch(list);
     }
 

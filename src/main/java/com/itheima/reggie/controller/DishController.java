@@ -82,11 +82,34 @@ public class DishController {
      * 用于回显
      */
     @GetMapping("/{id}")
-    public R<DishDto> get(@PathVariable Long id) {
+    public R<DishDto> getByDishId(@PathVariable Long id) {
         DishDto dishDto = dishService.getByIdWithFlavor(id);
 
         return R.success(dishDto);
     }
+
+    /**
+     * 根据分类id 查询对应 菜品list
+     * Get /dish/list?categoryId=1397844263642378242
+     * 用Long来接收：@RequestParam("categoryId") Long id
+     * 用Dish来接受：通用性更好
+     * 这时就不用加RequestBody或者RequestParam了：@RequestBody(required = false)
+     * 因为get请求没有携带请求体
+     */
+    @GetMapping("/list")
+    public R<List<Dish>> getByCategoryId(Dish dish) {
+        LambdaQueryWrapper<Dish> qw = new LambdaQueryWrapper<>();
+        // 根据分类id
+        qw.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
+        // 注意启售状态需要为1
+        qw.eq(Dish::getStatus, 1);
+        // 注意排序
+        qw.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+        List<Dish> list = dishService.list(qw);
+
+        return R.success(list);
+    }
+
 
     /**
      * 修改菜品：也修改口味表
