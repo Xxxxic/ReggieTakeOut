@@ -89,7 +89,7 @@ public class CommonController {
             }
         } catch (Exception e) {
             //e.printStackTrace();
-            log.error("文件下载失败：{}", e);
+            log.error("文件下载失败: {}", e.toString());
         }
     }
 }

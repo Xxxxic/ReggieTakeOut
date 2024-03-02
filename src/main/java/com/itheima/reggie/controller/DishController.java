@@ -110,7 +110,8 @@ public class DishController {
      */
     @PutMapping
     public R<String> update(@RequestBody DishDto dishDto) {
-        dishService.saveWithFlavor(dishDto);
+        //dishService.saveWithFlavor(dishDto);
+        dishService.updateWithFlavor(dishDto);
 
         return R.success("菜品修改成功");
     }

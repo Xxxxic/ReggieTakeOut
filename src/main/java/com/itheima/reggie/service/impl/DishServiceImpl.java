@@ -29,6 +29,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     /**
      * 新增菜品，同时保存对应的口味数据
+     *
      * @param dishDto
      */
     @Override
@@ -61,7 +62,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     }
 
     @Override
-    public DishDto getByIdWithFlavor(Long id){
+    public DishDto getByIdWithFlavor(Long id) {
         Dish dish = this.getById(id);
 
         // 根据口味id查询口味信息
@@ -78,9 +79,26 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     }
 
     @Override
-    public void updateWithFlavor(Dish dish){
-        // Dish table
-        // Flavor
+    @Transactional  // 多表查询要用事务
+    public void updateWithFlavor(DishDto dishDto) {
+        // Dish table: 实际上传的dish 向上转型
+        this.updateById(dishDto);
+
+        Long dishId = dishDto.getId();
+
+        // Flavor: 清理
+        // 问题：创建时间失效了
+        // 注意！如果口味表数据你用了逻辑删除,测试会显示用户已经存在
+        LambdaQueryWrapper<DishFlavor> qw = new LambdaQueryWrapper<>();
+        qw.eq(dishId != null, DishFlavor::getDishId, dishId);
+        dishFlavorService.remove(qw);
+
+        // Flavor: 重新加
+        List<DishFlavor> list = dishDto.getFlavors().stream().map((item) -> {
+            item.setDishId(dishId);
+            return item;
+        }).collect(Collectors.toList());
+        dishFlavorService.saveBatch(list);
     }
 
 }

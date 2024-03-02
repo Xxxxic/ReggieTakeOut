@@ -20,5 +20,5 @@ public interface DishService extends IService<Dish> {
     public DishDto getByIdWithFlavor(Long id);
 
     // 联合Flavor表一起更新
-    public void updateWithFlavor(Dish dish);
+    public void updateWithFlavor(DishDto dishDto);
 }
