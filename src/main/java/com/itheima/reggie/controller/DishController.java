@@ -6,7 +6,9 @@ import com.itheima.reggie.common.R;
 import com.itheima.reggie.dto.DishDto;
 import com.itheima.reggie.entity.Category;
 import com.itheima.reggie.entity.Dish;
+import com.itheima.reggie.entity.DishFlavor;
 import com.itheima.reggie.service.CategoryService;
+import com.itheima.reggie.service.DishFlavorService;
 import com.itheima.reggie.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -26,6 +28,9 @@ public class DishController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private DishFlavorService dishFlavorService;
 
     /**
      * 添加菜品
@@ -97,7 +102,7 @@ public class DishController {
      * 因为get请求没有携带请求体
      */
     @GetMapping("/list")
-    public R<List<Dish>> getByCategoryId(Dish dish) {
+    public R<List<DishDto>> getByCategoryId(Dish dish) {
         LambdaQueryWrapper<Dish> qw = new LambdaQueryWrapper<>();
         // 根据分类id
         qw.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
@@ -107,7 +112,13 @@ public class DishController {
         qw.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
         List<Dish> list = dishService.list(qw);
 
-        return R.success(list);
+        // 添加口味信息
+        List<DishDto> listRes = list.stream().map((item) -> {
+            // 赋值Flavors: 复用代码
+            return dishService.getByIdWithFlavor(item.getId());
+        }).collect(Collectors.toList());
+
+        return R.success(listRes);
     }
 
 
