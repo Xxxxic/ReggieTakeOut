@@ -39,21 +39,25 @@ public class CommonController {
 
         // 给上传的文件起一个名字存放
         String originalFileName = file.getOriginalFilename();
-        String suffix = originalFileName.substring(originalFileName.lastIndexOf("."));
-        String fileName = UUID.randomUUID().toString() + suffix;
+        String suffix = null;
+        if (originalFileName != null) {
+            suffix = originalFileName.substring(originalFileName.lastIndexOf("."));
+        }
+        String fileName = UUID.randomUUID() + suffix;
 
         // 创建一个目录存放
         File dir = new File(AssetsPath);
         if (!dir.exists()) {
             // 不存在 创建一个目录
-            dir.mkdirs();
+            boolean mkdirs = dir.mkdirs();
         }
 
         // 文件转存
         try {
             file.transferTo(new File(AssetsPath + '/' + fileName));
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            log.error("文件上传出错: {}", e.toString());
             return R.error("文件上传出错");
         }
 
@@ -62,10 +66,6 @@ public class CommonController {
 
     /**
      * 下载文件
-     *
-     * @param name     文件的名字
-     * @param response
-     * @return
      */
     @GetMapping("/download")
     // 参数名必须和前端表单中的name的值一致
@@ -73,15 +73,16 @@ public class CommonController {
         // 在try后面添加一个小括号: JVM资源管理
         try (
                 // 通过输入流读取文件内容 FileInputStream 用File从存储图片的地方获取用户需要的图片对象
-                FileInputStream fi = new FileInputStream(new File(AssetsPath + '/' + name));
+                // 不用new File： FileInputStream直接用名字初始化即可
+                FileInputStream fi = new FileInputStream(AssetsPath + '/' + name);
                 // 输出流将文件写回浏览器
-                ServletOutputStream os = response.getOutputStream();
+                ServletOutputStream os = response.getOutputStream()
         ) {
             // 设置写回去的文件类型
             response.setContentType("image/jpeg");
 
             // 缓存区读写文件
-            int len = 0;
+            int len;
             byte[] buf = new byte[1024];
             while ((len = fi.read(buf)) != -1) {
                 os.write(buf, 0, len);

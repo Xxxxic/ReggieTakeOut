@@ -13,5 +13,5 @@ public interface DishMapper extends BaseMapper<Dish> {
     @Select("select d.*, c.name as categoryName " +
             "from take_out.dish d left join take_out.category c on d.category_id = c.id " +
             "where d.name like CONCAT('%', #{name}, '%')")
-    public Page<DishDto> getDishDtoPage(Page<DishDto> page, @Param("name") String name);
+    Page<DishDto> getDishDtoPage(Page<DishDto> page, @Param("name") String name);
 }

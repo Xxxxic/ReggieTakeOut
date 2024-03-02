@@ -24,8 +24,6 @@ public class CategroyServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     /**
      * 根据id删除分类，删除之前进行外键约束的判断
      * dish & setmeal 表中有category的id
-     *
-     * @param id
      */
     public void remove(Long id) {
         // 查询是否关联了相应菜品 - 抛异常

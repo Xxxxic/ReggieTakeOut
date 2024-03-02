@@ -30,9 +30,6 @@ public class DishController {
     /**
      * 添加菜品
      * 钱数以分为单位：为了防止出现小数而导致精度丢失
-     *
-     * @return
-     * @Param DishDto
      */
     @PostMapping
     public R<String> save(@RequestBody DishDto dishDto) {
@@ -43,11 +40,6 @@ public class DishController {
 
     /**
      * 菜品dish的分页查询
-     *
-     * @param page
-     * @param pageSize
-     * @param name
-     * @return
      */
     @GetMapping("/page")
     public R<Page> page(int page, int pageSize, String name) {
@@ -88,9 +80,6 @@ public class DishController {
     /**
      * 根据菜品id查询菜品信息
      * 用于回显
-     *
-     * @param id
-     * @return
      */
     @GetMapping("/{id}")
     public R<DishDto> get(@PathVariable Long id) {
@@ -101,9 +90,6 @@ public class DishController {
 
     /**
      * 修改菜品：也修改口味表
-     *
-     * @return
-     * @Param DishDto
      */
     @PutMapping
     public R<String> update(@RequestBody DishDto dishDto) {

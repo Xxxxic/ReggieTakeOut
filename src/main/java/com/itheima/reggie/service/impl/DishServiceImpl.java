@@ -28,8 +28,6 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     /**
      * 新增菜品，同时保存对应的口味数据
-     *
-     * @param dishDto
      */
     @Override
     @Transactional  // 事务在发生异常时，会对数据库的操作回滚
@@ -44,21 +42,20 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         //    flavor.setDishId(id);
         //}
         // 2.foreach：但只可以遍历集合,不可以修改集合
-        // 3.stream流：stream map collect
-        List<DishFlavor> collect = dishDto.getFlavors().stream().map((item) -> {
-            item.setDishId(id);
-            return item;
-        }).collect(Collectors.toList());
+        // 3.stream流：stream peek collect
+        List<DishFlavor> collect = dishDto.getFlavors().stream()
+                .peek((item) -> item.setDishId(id))
+                .collect(Collectors.toList());
 
         // 保存菜品口味数据到dishFlavor
         // saveBatch批量保存：因为存放的flavor是一个集合
         dishFlavorService.saveBatch(collect);
     }
 
-    @Override
-    public Page<DishDto> getDishDtoPage(Page<DishDto> page, String name) {
-        return dishMapper.getDishDtoPage(page, name);
-    }
+    //@Override
+    //public Page<DishDto> getDishDtoPage(Page<DishDto> page, String name) {
+    //    return dishMapper.getDishDtoPage(page, name);
+    //}
 
     @Override
     public DishDto getByIdWithFlavor(Long id) {
