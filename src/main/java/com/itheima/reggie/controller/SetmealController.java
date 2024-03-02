@@ -40,33 +40,25 @@ public class SetmealController {
 
     @GetMapping("/page")
     public R<Page<SetmealDto>> list(int page, int pageSize, String name) {
-        Page<Setmeal> pageInfo = new Page<>(page, pageSize);
-        // 名字查询
-        LambdaQueryWrapper<Setmeal> qw = new LambdaQueryWrapper<>();
-        qw.like(name != null, Setmeal::getName, name);
-        qw.orderByDesc(Setmeal::getUpdateTime);
-
-        setmealService.page(pageInfo, qw);
-
-        // 此时查出来的有CategoryID，但是前端需要CategoryName，所以还需要再查一次
-        Page<SetmealDto> pageRes = new Page<>(page, pageSize);
-        BeanUtils.copyProperties(pageInfo, pageRes, "records");
-
-        List<SetmealDto> list = pageInfo.getRecords().stream().map((item) -> {
-            SetmealDto setmealDtoTemp = new SetmealDto();
-            BeanUtils.copyProperties(item, setmealDtoTemp);
-            // 赋值分类名
-            Category category = categoryService.getById(item.getCategoryId());
-            // 好习惯：每次查出来东西 就判断为不为空 避免空指针
-            if (category != null){
-                setmealDtoTemp.setCategoryName(category.getName());
-            }
-            return setmealDtoTemp;
-        }).collect(Collectors.toList());
-
-        pageRes.setRecords(list);
+        Page<SetmealDto> pageRes = setmealService.getPageWithCategoryName(page, pageSize, name);
 
         return R.success(pageRes);
+    }
+
+    /**
+     * 删除：单个 批量
+     * DELETE "setmeal?ids=1763836166919966722,1415580119015145474"
+     * 用List接收数据 这样就不用转换了
+     * [1763836166919966722, 1415580119015145474]
+     * TODO：停售功能
+     */
+    @DeleteMapping
+    public R<String> delete(@RequestParam("ids") List<Long> list) {
+        //log.info(list.toString());
+        // 涉及两张表的删除 setmeal setmealDish
+        setmealService.deleteWithSetmealDish(list);
+
+        return R.success("删除成功");
     }
 
 
