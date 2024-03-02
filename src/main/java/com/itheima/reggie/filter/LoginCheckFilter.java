@@ -47,7 +47,9 @@ public class LoginCheckFilter implements Filter {
                 "/employee/logout",
                 "/backend/**",  // 静态资源
                 "/front/**",
-                // "/page/demo/**" // 测试文件上传下载
+                "/common/**",   //
+                "/user/sendMsg", // 移动端发送短信
+                "/user/login",  // 移动端登陆
         };
         // 2.检查是否放行
         boolean check = check(urls, requestURI);
@@ -57,17 +59,29 @@ public class LoginCheckFilter implements Filter {
             filterChain.doFilter(request, response);
             return;
         }
-        // 4.需要处理:检查登陆状态，已登陆则直接放行
-        if(request.getSession().getAttribute("employee") != null){
-            // log.info("用户已登陆 {}", requestURI);
-            Long emId = (Long) request.getSession().getAttribute("employee");
-            BaseContext.setCurrentId(emId);
+        // 4-1.需要处理:检查登陆状态，已登陆则直接放行
+        if (request.getSession().getAttribute("employee") != null) {
+            log.info("用户已登录，用户id为：{}", request.getSession().getAttribute("employee"));
+
+            Long empId = (Long) request.getSession().getAttribute("employee");
+            BaseContext.setCurrentId(empId);
+
+            filterChain.doFilter(request, response);
+            return;
+        }
+        // TODO: 跳转有问题
+        // 4-2.需要处理:检查登陆状态，已登陆则直接放行
+        if (request.getSession().getAttribute("user") != null) {
+            log.info("用户已登录，用户id为：{}", request.getSession().getAttribute("user"));
+
+            Long userId = (Long) request.getSession().getAttribute("user");
+            BaseContext.setCurrentId(userId);
 
             filterChain.doFilter(request, response);
             return;
         }
         // 5.未登陆 - 不是跳转到登陆：未登陆 则返回未登陆的结果，通过输出流方式向客户端页面响应数据
-        //log.info("用户未登陆 {}", requestURI);
+        log.info("用户未登陆");
         response.getWriter().write(JSON.toJSONString(R.error("NOTLOGIN")));
     }
 }
