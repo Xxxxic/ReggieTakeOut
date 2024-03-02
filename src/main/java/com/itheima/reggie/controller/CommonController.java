@@ -73,7 +73,7 @@ public class CommonController {
         // 在try后面添加一个小括号: JVM资源管理
         try (
                 // 通过输入流读取文件内容 FileInputStream 用File从存储图片的地方获取用户需要的图片对象
-                FileInputStream fi = new FileInputStream(new File(AssetsPath + '/'+ name));
+                FileInputStream fi = new FileInputStream(new File(AssetsPath + '/' + name));
                 // 输出流将文件写回浏览器
                 ServletOutputStream os = response.getOutputStream();
         ) {
@@ -88,7 +88,8 @@ public class CommonController {
                 os.flush();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            log.error("文件下载失败：{}", e);
         }
     }
 }

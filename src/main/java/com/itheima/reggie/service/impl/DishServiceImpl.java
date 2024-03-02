@@ -1,5 +1,7 @@
 package com.itheima.reggie.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.itheima.reggie.dto.DishDto;
 import com.itheima.reggie.entity.Dish;
@@ -7,6 +9,7 @@ import com.itheima.reggie.entity.DishFlavor;
 import com.itheima.reggie.mapper.DishMapper;
 import com.itheima.reggie.service.DishFlavorService;
 import com.itheima.reggie.service.DishService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +23,9 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     @Autowired
     private DishFlavorService dishFlavorService;
+
+    @Autowired
+    private DishMapper dishMapper;
 
     /**
      * 新增菜品，同时保存对应的口味数据
@@ -49,5 +55,32 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         dishFlavorService.saveBatch(collect);
     }
 
+    @Override
+    public Page<DishDto> getDishDtoPage(Page<DishDto> page, String name) {
+        return dishMapper.getDishDtoPage(page, name);
+    }
+
+    @Override
+    public DishDto getByIdWithFlavor(Long id){
+        Dish dish = this.getById(id);
+
+        // 根据口味id查询口味信息
+        LambdaQueryWrapper<DishFlavor> qw = new LambdaQueryWrapper<>();
+        qw.eq(dish.getId() != null, DishFlavor::getDishId, dish.getId());
+        List<DishFlavor> list = dishFlavorService.list(qw);
+
+        // 用DTO存储口味信息
+        DishDto dishDto = new DishDto();
+        BeanUtils.copyProperties(dish, dishDto);
+        dishDto.setFlavors(list);
+
+        return dishDto;
+    }
+
+    @Override
+    public void updateWithFlavor(Dish dish){
+        // Dish table
+        // Flavor
+    }
 
 }
