@@ -5,12 +5,15 @@ import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.itheima.reggie.common.BaseContext;
 import com.itheima.reggie.common.CustomException;
+import com.itheima.reggie.common.R;
+import com.itheima.reggie.dto.OrdersDto;
 import com.itheima.reggie.entity.*;
 import com.itheima.reggie.mapper.OrdersMapper;
 import com.itheima.reggie.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -34,10 +37,9 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders>
 
     /**
      * 提交订单：提交订单，然后将订单明细提交到OrdersDetail
-     *
      */
     @Override
-    public void submitWithOrderDetail(Orders orders){
+    public void submitWithOrderDetail(Orders orders) {
         // Orders(id=null, number=null, status=null, userId=null, addressBookId=1763914545476190209, orderTime=null, checkoutTime=null,
         // payMethod=1, amount=null, remark=, userName=null, phone=null, address=null, consignee=null)
         log.info(orders.toString());
@@ -46,11 +48,11 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders>
         Long userId = BaseContext.getCurrentId();
         //根据用户id查询其购物车数据
         LambdaQueryWrapper<ShoppingCart> qw = new LambdaQueryWrapper<>();
-        qw.eq(userId!=null,ShoppingCart::getUserId, userId);
+        qw.eq(userId != null, ShoppingCart::getUserId, userId);
         List<ShoppingCart> listShoppingCart = shoppingCartService.list(qw);
 
         // 检查无法下单的情况：购物车 或 地址为空
-        if(shoppingCartService==null){
+        if (shoppingCartService == null) {
             throw new CustomException("购物车为空，无法下单");
         }
         Long addressBookId = orders.getAddressBookId();
@@ -64,7 +66,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders>
         long orderId = IdWorker.getId();    // ？
         AtomicInteger amount = new AtomicInteger();
         // 填充订单细节信息
-        List<OrderDetail> orderDetailList = listShoppingCart.stream().map((item)->{
+        List<OrderDetail> orderDetailList = listShoppingCart.stream().map((item) -> {
             OrderDetail temp = new OrderDetail();
             temp.setOrderId(orderId);
             temp.setName(item.getName());
@@ -90,10 +92,10 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders>
         orders.setConsignee(addressBook.getConsignee());
         orders.setAddressBookId(addressBookId);
         orders.setAddress(
-                (addressBook.getProvinceName() == null ? "":addressBook.getProvinceName())+
-                        (addressBook.getCityName() == null ? "":addressBook.getCityName())+
-                        (addressBook.getDistrictName() == null ? "":addressBook.getDistrictName())+
-                        (addressBook.getDetail() == null ? "":addressBook.getDetail())
+                (addressBook.getProvinceName() == null ? "" : addressBook.getProvinceName()) +
+                        (addressBook.getCityName() == null ? "" : addressBook.getCityName()) +
+                        (addressBook.getDistrictName() == null ? "" : addressBook.getDistrictName()) +
+                        (addressBook.getDetail() == null ? "" : addressBook.getDetail())
         );
         orders.setOrderTime(LocalDateTime.now());
         orders.setCheckoutTime(LocalDateTime.now());
@@ -107,4 +109,6 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders>
         //清空购物车数据
         shoppingCartService.remove(qw);
     }
+
+
 }
