@@ -39,7 +39,8 @@ public class UserController {
             // TODO: 存入Redis 加上过期时间
             // 存起来HttpSession（可以存在redis） 用于后期比对
             session.setAttribute(phone, code);
-            return R.success("短信发送成功");
+            //return R.success("短信发送成功");
+            return R.success(code);
         }
         return R.error("短信发送失败");
     }

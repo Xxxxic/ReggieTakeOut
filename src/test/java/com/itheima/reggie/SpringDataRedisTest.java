@@ -77,32 +77,4 @@ public class SpringDataRedisTest {
             System.out.println(myset);
         }
     }
-
-    @Test
-    public void testZSet() {
-        ZSetOperations<String, String> zops = redisTemplate.opsForZSet();
-
-
-        zops.add("myzset", "c", 13.0);
-        zops.add("myzset", "a", 10.0);
-        zops.add("myzset", "a", 11.0);
-        zops.add("myzset", "b", 12.0);
-        zops.add("myzset", "d", 22.0);
-
-        for (String s : Objects.requireNonNull(zops.range("myzset", 0, -1))) {
-            System.out.println(s);
-        }
-
-        zops.incrementScore("myzset", "a", 20);
-        System.out.println("11111");
-        for (String s : Objects.requireNonNull(zops.range("myzset", 0, -1))) {
-            System.out.println(s);
-        }
-
-        zops.remove("myzset", "b");
-        System.out.println("11111");
-        for (String s : Objects.requireNonNull(zops.range("myzset", 0, -1))) {
-            System.out.println(s);
-        }
-    }
 }
