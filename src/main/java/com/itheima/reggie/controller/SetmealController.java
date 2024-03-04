@@ -6,15 +6,16 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.itheima.reggie.common.CustomException;
 import com.itheima.reggie.common.R;
 import com.itheima.reggie.dto.SetmealDto;
-import com.itheima.reggie.entity.Dish;
 import com.itheima.reggie.entity.Setmeal;
+import com.itheima.reggie.entity.SetmealDish;
+import com.itheima.reggie.service.SetmealDishService;
 import com.itheima.reggie.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * 对于Setmeal - Dish 只需要一个controller即可
@@ -25,6 +26,8 @@ import java.util.Set;
 public class SetmealController {
     @Autowired
     private SetmealService setmealService;
+    @Autowired
+    private SetmealDishService setmealDishService;
 
     @PostMapping
     public R<String> save(@RequestBody SetmealDto setmealDto) {
@@ -87,7 +90,7 @@ public class SetmealController {
         //log.info(ids.toString());
 
         // 检查非法情况
-        if (status != 0  && status != 1) {
+        if (status != 0 && status != 1) {
             throw new CustomException("状态请求参数错误");
         }
         if (status == 1) {
@@ -103,6 +106,22 @@ public class SetmealController {
         setmealService.update(uw);
 
         return R.success("套餐状态修改成功");
+    }
+
+    @GetMapping("/{id}")
+    public R<SetmealDto> getOne(@PathVariable Long id) {
+
+        SetmealDto setmealDto = new SetmealDto();
+        Setmeal one = setmealService.getById(id);
+        if (one == null) {
+            throw new CustomException("套餐不存在！");
+        }
+        BeanUtils.copyProperties(one, setmealDto);
+        LambdaQueryWrapper<SetmealDish> qw = new LambdaQueryWrapper<>();
+        qw.eq(setmealDto.getId() != null, SetmealDish::getSetmealId, setmealDto.getId());
+        List<SetmealDish> list = setmealDishService.list(qw);
+        setmealDto.setSetmealDishes(list);
+        return R.success(setmealDto);
     }
 
 }

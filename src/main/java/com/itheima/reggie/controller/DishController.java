@@ -7,7 +7,6 @@ import com.itheima.reggie.dto.DishDto;
 import com.itheima.reggie.entity.Category;
 import com.itheima.reggie.entity.Dish;
 import com.itheima.reggie.service.CategoryService;
-import com.itheima.reggie.service.DishFlavorService;
 import com.itheima.reggie.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -28,9 +27,6 @@ public class DishController {
     @Autowired
     private CategoryService categoryService;
 
-    @Autowired
-    private DishFlavorService dishFlavorService;
-
     /**
      * 添加菜品
      * 钱数以分为单位：为了防止出现小数而导致精度丢失
@@ -46,7 +42,7 @@ public class DishController {
      * 菜品dish的分页查询
      */
     @GetMapping("/page")
-    public R<Page> page(int page, int pageSize, String name) {
+    public R<Page<DishDto>> page(int page, int pageSize, String name) {
         // 分页器对象
         // 直接对dish进行分页查询，查询出来的数据是没有categoryName的
         Page<Dish> pageDish = new Page<>(page, pageSize);

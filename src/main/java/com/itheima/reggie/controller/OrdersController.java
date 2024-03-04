@@ -14,11 +14,8 @@ import com.itheima.reggie.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,7 +43,7 @@ public class OrdersController {
     public R<Page<OrdersDto>> list(int page, int pageSize) {
         Long userId = BaseContext.getCurrentId();
 
-        Page<Orders> pageInfo = new Page(page, pageSize);
+        Page<Orders> pageInfo = new Page<>(page, pageSize);
         Page<OrdersDto> pageInfoDto = new Page<>(page, pageSize);
 
         LambdaQueryWrapper<Orders> qw = new LambdaQueryWrapper<>();

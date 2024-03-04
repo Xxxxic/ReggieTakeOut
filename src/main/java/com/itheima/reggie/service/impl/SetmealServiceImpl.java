@@ -106,7 +106,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal>
         // 根据SetmealId检查 菜品启售状态
         for (Long id : list) {
             int num = setmealDishMapper.checkDishStatus(id);
-            log.info("查询停用菜品数: {}", String.valueOf(num));
+            //log.info("查询停用菜品数: {}", String.valueOf(num));
             if(num > 0){
                 return false;
             }

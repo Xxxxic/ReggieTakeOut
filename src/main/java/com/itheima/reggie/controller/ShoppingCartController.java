@@ -5,8 +5,6 @@ import com.itheima.reggie.common.BaseContext;
 import com.itheima.reggie.common.CustomException;
 import com.itheima.reggie.common.R;
 import com.itheima.reggie.entity.ShoppingCart;
-import com.itheima.reggie.service.DishService;
-import com.itheima.reggie.service.SetmealService;
 import com.itheima.reggie.service.ShoppingCartService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +19,6 @@ import java.util.List;
 public class ShoppingCartController {
     @Autowired
     private ShoppingCartService shoppingCartService;
-
-    @Autowired
-    private DishService dishService;
-    @Autowired
-    private SetmealService setmealService;
 
     /**
      * 添加到购物车
