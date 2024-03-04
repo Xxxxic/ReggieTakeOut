@@ -11,7 +11,7 @@ public class ValidateCodeUtils {
      * @param length 长度为4位或者6位
      */
     public static Integer generateValidateCode(int length){
-        Integer code =null;
+        int code;
         if(length == 4){
             code = new Random().nextInt(9999);//生成随机数，最大为9999
             if(code < 1000){
@@ -35,7 +35,6 @@ public class ValidateCodeUtils {
     public static String generateValidateCode4String(int length){
         Random rdm = new Random();
         String hash1 = Integer.toHexString(rdm.nextInt());
-        String capstr = hash1.substring(0, length);
-        return capstr;
+        return hash1.substring(0, length);
     }
 }

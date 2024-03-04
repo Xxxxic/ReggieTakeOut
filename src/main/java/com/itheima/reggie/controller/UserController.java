@@ -8,7 +8,7 @@ import com.itheima.reggie.utils.ValidateCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 
 @RestController
 @RequestMapping("/user")
@@ -23,9 +25,13 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @PostMapping("/sendMsg")
-    public R<String> sendMsg(@RequestBody User user, HttpSession session) {
+    //@Cacheable(key = "#user.phone", value = "code")
+    // 要用缓存就要避免自调用
+    public R<String> sendMsg(@RequestBody User user) {
         // 获取手机号
         String phone = user.getPhone();
         if (StringUtils.isNotEmpty(phone)) {
@@ -36,10 +42,11 @@ public class UserController {
             // 调用阿里云发送短信验证码
             //SMSUtils.sendMessage("reggie", phone, s, "");
 
-            // TODO: 存入Redis 加上过期时间
             // 存起来HttpSession（可以存在redis） 用于后期比对
-            session.setAttribute(phone, code);
-            //return R.success("短信发送成功");
+            //session.setAttribute(phone, code);
+
+            redisTemplate.opsForValue().set(phone, code,5, TimeUnit.MINUTES);
+
             return R.success(code);
         }
         return R.error("短信发送失败");
@@ -51,14 +58,15 @@ public class UserController {
         //log.info(map.toString());
         String phone = map.get("phone");
         String code = map.get("code");
-        Object codeInSession = session.getAttribute(phone);
+        //Object codeInSession = session.getAttribute(phone);
+        Object codeInSession = redisTemplate.opsForValue().get(phone);
         log.info(code);
 
         //进行验证码的比对（页面提交的验证码和Session中保存的验证码比对）
         if (codeInSession != null && codeInSession.equals(code)) {
             // 从数据库检索用户
             LambdaQueryWrapper<User> qw = new LambdaQueryWrapper<>();
-            qw.eq(phone != null, User::getPhone, phone);
+            qw.eq(User::getPhone, phone);
             User user = userService.getOne(qw);
             // 没找到 - 注册
             if (user == null) {
@@ -70,6 +78,10 @@ public class UserController {
             // 易漏：保存用户登录状态
             session.setAttribute("user", user.getId());
             //log.info(session.getAttribute("user").toString());
+
+            // 删除验证码
+            redisTemplate.delete(phone);
+
             return R.error("登陆成功");
         }
         return R.error("登陆失败");

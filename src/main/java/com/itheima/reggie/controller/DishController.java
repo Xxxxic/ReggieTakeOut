@@ -11,6 +11,9 @@ import com.itheima.reggie.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,14 +29,18 @@ public class DishController {
 
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    RedisTemplate redisTemplate;
 
     /**
      * 添加菜品
      * 钱数以分为单位：为了防止出现小数而导致精度丢失
      */
     @PostMapping
+    @CacheEvict(value = "DishCache", allEntries = true)
     public R<String> save(@RequestBody DishDto dishDto) {
         //log.info(dishDto.toString());
+
         dishService.saveWithFlavor(dishDto);
         return R.success("菜品添加成功");
     }
@@ -42,6 +49,7 @@ public class DishController {
      * 菜品dish的分页查询
      */
     @GetMapping("/page")
+    @Cacheable(value = "DishCache", key = "'page_'+#page+'_'+#pageSize+'_'+#name")
     public R<Page<DishDto>> page(int page, int pageSize, String name) {
         // 分页器对象
         // 直接对dish进行分页查询，查询出来的数据是没有categoryName的
@@ -82,6 +90,7 @@ public class DishController {
      * 用于回显
      */
     @GetMapping("/{id}")
+    @Cacheable(value = "DishCache", key = "#p0")
     public R<DishDto> getByDishId(@PathVariable Long id) {
         DishDto dishDto = dishService.getByIdWithFlavor(id);
 
@@ -95,8 +104,11 @@ public class DishController {
      * 用Dish来接受：通用性更好
      * 这时就不用加RequestBody或者RequestParam了：@RequestBody(required = false)
      * 因为get请求没有携带请求体
+     * ||
+     * 新增Redis缓存: key为dish_分类id_状态
      */
     @GetMapping("/list")
+    @Cacheable(value = "DishCache", key = "dish.categoryId + '_' + dish.status")
     public R<List<DishDto>> getByCategoryId(Dish dish) {
         LambdaQueryWrapper<Dish> qw = new LambdaQueryWrapper<>();
         // 根据分类id
@@ -121,6 +133,7 @@ public class DishController {
      * 修改菜品：也修改口味表
      */
     @PutMapping
+    @CacheEvict(value = "DishCache", allEntries = true)
     public R<String> update(@RequestBody DishDto dishDto) {
         //dishService.saveWithFlavor(dishDto);
         dishService.updateWithFlavor(dishDto);
