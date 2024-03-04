@@ -69,7 +69,7 @@ public class LoginCheckFilter implements Filter {
             filterChain.doFilter(request, response);
             return;
         }
-        // TODO: 跳转有问题
+        // 跳转有问题: 前端代码的锅！！！
         // 4-2.需要处理:检查登陆状态，已登陆则直接放行
         if (request.getSession().getAttribute("user") != null) {
             log.info("用户已登录，用户id为：{}", request.getSession().getAttribute("user"));
