@@ -8,10 +8,12 @@ import com.itheima.reggie.dto.SetmealDto;
 import com.itheima.reggie.entity.Category;
 import com.itheima.reggie.entity.Setmeal;
 import com.itheima.reggie.entity.SetmealDish;
+import com.itheima.reggie.mapper.SetmealDishMapper;
 import com.itheima.reggie.mapper.SetmealMapper;
 import com.itheima.reggie.service.CategoryService;
 import com.itheima.reggie.service.SetmealDishService;
 import com.itheima.reggie.service.SetmealService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,8 +22,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal>
         implements SetmealService {
+    @Autowired
+    private SetmealDishMapper setmealDishMapper;
     @Autowired
     private SetmealDishService setmealDishService;
     @Autowired
@@ -82,7 +87,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal>
         // select count(*) from setmeal where id in ids and status = 1;
         LambdaQueryWrapper<Setmeal> qw1 = new LambdaQueryWrapper<>();
         qw1.in(Setmeal::getId, list).eq(Setmeal::getStatus, 1);
-        if(this.count(qw1)>0){
+        if (this.count(qw1) > 0) {
             throw new CustomException("套餐正启售中，无法删除");
         }
 
@@ -95,4 +100,19 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal>
         qw2.in(SetmealDish::getSetmealId, list);
         setmealDishService.remove(qw2);
     }
+
+    @Override
+    public boolean checkDishStatus(List<Long> list) {
+        // 根据SetmealId检查 菜品启售状态
+        for (Long id : list) {
+            int num = setmealDishMapper.checkDishStatus(id);
+            log.info("查询停用菜品数: {}", String.valueOf(num));
+            if(num > 0){
+                return false;
+            }
+        }
+        return true;
+    }
+
+
 }

@@ -15,4 +15,7 @@ public interface SetmealService extends IService<Setmeal> {
 
     // 删除套餐 同时删除关联关系
     void deleteWithSetmealDish(List<Long> list);
+
+    // 检查套餐中的菜品是否都为启售状态
+    boolean checkDishStatus(List<Long> list);
 }
