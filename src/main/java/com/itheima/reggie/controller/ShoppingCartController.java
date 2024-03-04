@@ -4,8 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.itheima.reggie.common.BaseContext;
 import com.itheima.reggie.common.CustomException;
 import com.itheima.reggie.common.R;
-import com.itheima.reggie.entity.Dish;
-import com.itheima.reggie.entity.Setmeal;
 import com.itheima.reggie.entity.ShoppingCart;
 import com.itheima.reggie.service.DishService;
 import com.itheima.reggie.service.SetmealService;
