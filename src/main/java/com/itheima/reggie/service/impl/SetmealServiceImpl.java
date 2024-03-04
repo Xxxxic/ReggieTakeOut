@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +34,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal>
     private CategoryService categoryService;
 
     @Override
+    @Transactional
     public void saveWithSetmealDish(SetmealDto setmealDto) {
         // 保存到Setmeal表中
         this.save(setmealDto);
@@ -47,6 +49,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal>
     }
 
     @Override
+    @Transactional
     public Page<SetmealDto> getPageWithCategoryName(int page, int pageSize, String name) {
         Page<Setmeal> pageInfo = new Page<>(page, pageSize);
         // 名字查询

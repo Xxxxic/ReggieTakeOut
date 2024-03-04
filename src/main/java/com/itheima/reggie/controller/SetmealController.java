@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 对于Setmeal - Dish 只需要一个controller即可
@@ -122,6 +123,32 @@ public class SetmealController {
         List<SetmealDish> list = setmealDishService.list(qw);
         setmealDto.setSetmealDishes(list);
         return R.success(setmealDto);
+    }
+
+    /**
+     * 修改套餐
+     * 先根据Setmeal_id 把setmealDish表中对应套餐的数据删了
+     * 然后重新添加 调用前面写好的方法
+     */
+    @PutMapping
+    public R<String> update(@RequestBody SetmealDto setmealDto) {
+        // 删除
+        LambdaQueryWrapper<SetmealDish> qw = new LambdaQueryWrapper<>();
+        qw.eq(setmealDto.getId() != null, SetmealDish::getSetmealId, setmealDto.getId());
+        setmealDishService.remove(qw);
+
+        //更新套餐数据
+        setmealService.updateById(setmealDto);
+
+        // 保存其中的菜品关系 到SetmealDish表中
+        // 先将Setmeal的Id赋值
+        List<SetmealDish> list = setmealDto.getSetmealDishes().stream()
+                .peek((item) -> item.setSetmealId(setmealDto.getId()))
+                .collect(Collectors.toList());
+        // 然后再Batch保存
+        setmealDishService.saveBatch(list);
+
+        return R.success("套餐更新成功");
     }
 
 }

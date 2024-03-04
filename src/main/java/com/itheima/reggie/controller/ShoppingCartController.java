@@ -24,8 +24,7 @@ public class ShoppingCartController {
      * 添加到购物车
      * 不用 HttpServletRequest servletRequest
      * 直接去BaseContext取UserId
-     * POST http://localhost/shoppingCart/add
-     *
+     * POST /shoppingCart/add
      * @param shoppingCart 某个菜品
      * @return 返回信息
      */
